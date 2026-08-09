@@ -1,0 +1,29 @@
+services:
+  questionnarie_backend:
+    build:
+      context: .
+      dockerfile: ./infra/local/Dockerfile
+    container_name: questionnarie_django
+    restart: unless-stopped
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - ${EXTERNAL_DJANGO_PORT}:${DJANGO_PORT}
+    depends_on:
+      - questionnarie_pgdb
+    env_file:
+      - ./infra/local/.env.local
+
+  questionnarie_pgdb:
+    image: postgres
+    container_name: questionnarie_pgdb
+    restart: unless-stopped
+    ports:
+      - ${EXTERNAL_POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./infra/local/.env.local
+
+volumes:
+  postgres_data: null
