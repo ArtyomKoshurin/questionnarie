@@ -15,7 +15,7 @@ services:
       - ./infra/local/.env.local
 
   questionnarie_pgdb:
-    image: postgres
+    image: postgres:17
     container_name: questionnarie_pgdb
     restart: unless-stopped
     ports:
