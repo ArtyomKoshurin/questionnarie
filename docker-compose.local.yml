@@ -6,7 +6,7 @@ services:
     container_name: questionnarie_django
     restart: unless-stopped
     volumes:
-      - .:/usr/src/app
+      - ./src:/usr/src/app/src
     ports:
       - ${EXTERNAL_DJANGO_PORT}:${DJANGO_PORT}
     depends_on:

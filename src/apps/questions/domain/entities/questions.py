@@ -28,9 +28,16 @@ class Questionnaire(BaseEntity):
 
 
 @dataclass
-class QuestionnaireStatistic(BaseEntity):
+class QuestionAnswer(BaseEntity):
+    question: Question
+    selected_answer: Answer
+
+
+@dataclass
+class QuestionnaireCompletion(BaseEntity):
     questionnaire: Questionnaire
     participant: User
     started_at: datetime
+    user_answers: list[QuestionAnswer] = field(default_factory=[])
     status: QuestionnaireStatus = field(default=QuestionnaireStatus.in_progress)
     finished_at: datetime | None = field(default=None)

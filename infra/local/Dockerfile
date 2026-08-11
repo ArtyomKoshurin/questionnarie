@@ -22,6 +22,7 @@ RUN pip install --upgrade pip && \
 ADD ./infra/local/entrypoint.sh /
 RUN sed -i 's/\r$//g' /entrypoint.sh && chmod +x /entrypoint.sh
 
-COPY /src .
+COPY manage.py .
+COPY /src ./src/
 
 ENTRYPOINT ["/entrypoint.sh"]
