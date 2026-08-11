@@ -1,0 +1,3 @@
+[flake8]
+extend-ignore = A003,E800,E275,A002,DUO122,DUO123,DUO107
+max-line-length = 120
