@@ -6,6 +6,6 @@ from src.apps.users.domain.values.user import UserRole
 
 @dataclass
 class User(BaseEntity):
-    name: str
+    username: str
     email: str
     role: UserRole

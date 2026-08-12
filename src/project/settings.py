@@ -1,5 +1,6 @@
-import environ
 from pathlib import Path
+
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -53,8 +54,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'src.project.wsgi.application'
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': env('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
@@ -65,8 +64,6 @@ DATABASES = {
         'PORT': env('POSTGRES_PORT'),
     },
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -82,6 +79,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+AUTH_USER_MODEL = "users.CustomUser"
 
 LOGLEVEL = env('DJANGO_LOGLEVEL', default='info').upper()
 LOGGING = {
@@ -113,8 +111,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
