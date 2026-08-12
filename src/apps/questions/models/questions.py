@@ -1,8 +1,9 @@
 from django.db import models
 
 from src.apps.common.models import AddUUIDModel
-from src.apps.questions.domain.entities.questions import (Answer, Question,
-                                                          Questionnaire)
+from src.apps.questions.domain.entities.questions import (
+    Answer, Question, QuestionAnswer, Questionnaire, QuestionnaireCompletion)
+from src.apps.questions.domain.values.questions import QuestionnaireStatus
 from src.apps.users.models.user import CustomUser
 
 
@@ -57,6 +58,8 @@ class QuestionModel(AddUUIDModel):
     class Meta:
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
+        unique_together = [("questionnaire", "order_number")]
+        ordering = ["order_number"]
 
 
 class AnswerModel(AddUUIDModel):
@@ -79,9 +82,89 @@ class AnswerModel(AddUUIDModel):
     def __str__(self):
         return (
             f"Ответ {self.order_number} вопроса {self.question.order_number} "
-            f"вопросника {self.question.questionnaire.name}",
+            f"опроса {self.question.questionnaire.name}",
         )
 
     class Meta:
         verbose_name = "Ответ"
         verbose_name_plural = "Ответы"
+        unique_together = [("question", "order_number")]
+        ordering = ["order_number"]
+
+
+class QuestionnaireCompletionModel(AddUUIDModel):
+    questionnaire = models.ForeignKey(
+        QuestionnaireModel,
+        on_delete=models.CASCADE,
+        related_name="questionnaire_completions",
+        verbose_name="Опросник",
+    )
+    participant = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="questionnaire_completions",
+        verbose_name="Участник",
+    )
+    status = models.CharField(
+        choices=QuestionnaireStatus.choices(),
+        default=QuestionnaireStatus.in_progress,
+        verbose_name="Статус прохождения",
+    )
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата начала прохождения")
+    finished_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата окончания прохождения")
+
+    def to_entity(self) -> QuestionnaireCompletion:
+        return QuestionnaireCompletion(
+            uuid=self.uuid,
+            questionnaire=self.questionnaire.to_entity(),
+            participant=self.participant.to_entity(),
+            started_at=self.started_at,
+            finished_at=self.finished_at,
+            status=QuestionnaireStatus[self.status],
+            user_answers=[obj.to_entity() for obj in self.user_answers.all()],
+        )
+
+    def __str__(self):
+        return f"Информация о прохождении опроса {self.questionnaire.name} пользователем {self.participant.username}"
+
+    class Meta:
+        verbose_name = "Информация о прохождении опроса"
+        verbose_name_plural = "Информация о прохождении опросов"
+
+
+class QuestionAnswerModel(AddUUIDModel):
+    completion = models.ForeignKey(
+        QuestionnaireCompletionModel,
+        on_delete=models.CASCADE,
+        related_name="user_answers",
+        verbose_name="Информация о прохождении",
+    )
+    question = models.ForeignKey(
+        QuestionModel,
+        on_delete=models.CASCADE,
+        related_name="user_answers",
+        verbose_name="Вопрос",
+    )
+    selected_answer = models.ForeignKey(
+        AnswerModel,
+        on_delete=models.CASCADE,
+        related_name="user_answers",
+        verbose_name="Ответ",
+    )
+
+    def to_entity(self) -> QuestionAnswer:
+        return QuestionAnswer(
+            uuid=self.uuid,
+            question=self.question.to_entity(),
+            selected_answer=self.selected_answer.to_entity(),
+        )
+
+    def __str__(self):
+        return (
+            f"Выбранный ответ {self.selected_answer.order_number} на вопрос {self.question} "
+            f"опросника {self.question.questionnaire.name}"
+        )
+
+    class Meta:
+        verbose_name = "Выбранный ответ на вопрос"
+        verbose_name_plural = "Выбранные ответы на вопросы"
