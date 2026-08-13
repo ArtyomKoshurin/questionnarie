@@ -35,7 +35,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = ["uuid", "question", "questionnaire", "text", "order_number"]
     search_fields = ("uuid",)
     readonly_fields = ("uuid",)
-    list_select_related = ("question", "questionnaire")
+    list_select_related = ("question",)
 
     def question(self, obj):
         return obj.question.order_number

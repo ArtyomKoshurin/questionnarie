@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'src.apps.questions.apps.QuestionsConfig',
 
     'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

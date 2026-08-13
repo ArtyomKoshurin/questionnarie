@@ -82,7 +82,7 @@ class AnswerModel(AddUUIDModel):
     def __str__(self):
         return (
             f"Ответ {self.order_number} вопроса {self.question.order_number} "
-            f"опроса {self.question.questionnaire.name}",
+            f"опроса {self.question.questionnaire.name}"
         )
 
     class Meta:
